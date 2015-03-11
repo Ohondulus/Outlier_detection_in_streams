@@ -2,8 +2,7 @@ import math
 
 # 2D point class for incoming datas
 class DataPoint:
-    x = 0
-    y = 0
+    x = []
 
     # the number of phases this facility was a temporal outlier
     outlierscore = 0
@@ -17,9 +16,8 @@ class DataPoint:
     dist = -1
 
     # initialize data point
-    def init(self, x, y):
-        self.x = x
-        self.y = y
+    def init(self, x):
+        self.x = list(x)
 
     # assign the point to this facility by increaseing its weight
     def assignPoint(self, p):
@@ -36,12 +34,14 @@ class DataPoint:
 
     # calculates the distance of 2 given points
     def point_distance(self, p1, p2):
-        # c^2 = a^2 + b^2
+        # euclidesian distance
         x1 = p1.x
-        y1 = p1.y
         x2 = p2.x
-        y2 = p2.y
-        xdiff = x2 - x1
-        ydiff = y2 - y1
-        dist = math.sqrt((xdiff*xdiff)+(ydiff*ydiff))
+
+        distsquare = 0
+        for i,j in zip(x1,x2):
+            square = (i-j)*(i-j)
+            distsquare += square
+
+        dist = math.sqrt(distsquare)
         return dist

@@ -93,22 +93,23 @@ class Exactbolt(storm.BasicBolt):
 
     def process(self, tup):
         data = []
-        val = tup.values[0].split(",")
-        data.append(float(val[0]))
-        data.append(float(val[1]))
+        data = tup.values[0].split(",")
 
         self.exs.run_once(data)
 
         self.t += 1
-        if self.t >= self.sample:
+        if self.t >= self.sample and self.sample != -1:
             self.exs.sample_outliers_and_plot()
             self.t = 0
         #with self.bufflock:
         #    self.bufferlist.append(data)
 
-#test = Exactbolt()
-#test.initialize("yes","yes")
-#while(True):
-#    tup = storm.Tuple("yes","yes","yes","yes",(1,1))
-#    test.process(tup)
+"""
+test = Exactbolt()
+test.initialize("yes","yes")
+while(True):
+    val = ("1,1,1,1,1")
+    tup = storm.Tuple("yes","yes","yes","yes",val)
+    test.process(tup)
+"""
 Exactbolt().run()

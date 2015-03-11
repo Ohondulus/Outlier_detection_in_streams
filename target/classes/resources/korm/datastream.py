@@ -31,10 +31,11 @@ class DataStream:
         self.currentChunk = []
         for data in chunk:
             try:
+                x = []
                 point = dp.DataPoint()
-                x = float(data[0])
-                y = float(data[1])
-                point.init(x, y)
+                for dim in data:
+                    x.append(float(dim))
+                point.init(x)
 
                 self.currentChunk.append(point)
                 self.current += 1

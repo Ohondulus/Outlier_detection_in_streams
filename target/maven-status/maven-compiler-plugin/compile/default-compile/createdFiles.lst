@@ -1,7 +1,9 @@
+storm/starter/DenStream$DenStreambolt.class
+storm/starter/ExactStorm.class
+storm/starter/DenStream.class
+storm/starter/Kormalt$Kormaltbolt.class
+storm/starter/ExactStorm$Exactbolt.class
 storm/starter/Korm$Kormbolt.class
 storm/starter/Kormalt.class
 storm/starter/Korm.class
-storm/starter/ExactStorm.class
-storm/starter/Kormalt$Kormaltbolt.class
 storm/starter/spout/RandomPoints.class
-storm/starter/ExactStorm$Exactbolt.class

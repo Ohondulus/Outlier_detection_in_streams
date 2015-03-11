@@ -57,8 +57,8 @@ class ExactStorm:
             if len(self.ISB) == 0:
                 self.pivot = self.DS.current_data_point()
 
-            if self.rescale:
-                (max_x, max_y) = self.DS.current_data_point().rescale(self.ISB, self.pivot)
+            #if self.rescale:
+            #    (max_x, max_y) = self.DS.current_data_point().rescale(self.ISB, self.pivot)
                 
 
             # remove the expired node

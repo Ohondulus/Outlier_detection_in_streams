@@ -45,7 +45,7 @@ class DataStream:
                     self.time_id += 1
                     point_id = self.time_id
 
-                    point.init(x,y, point_id)
+                    point.init(x, y, point_id)
                     self.datapoint = point
                     return True
                 except Exception as ex:
@@ -58,13 +58,14 @@ class DataStream:
     def set_data_point(self, data):
         point = dp.DataPoint()
         try:
-            x = float(data[0])
-            y = float(data[1])
+            x = []
+            for dim in data:
+                x.append(float(dim))
 
             self.time_id += 1
             point_id = self.time_id
 
-            point.init(x,y, point_id)
+            point.init(x, point_id)
             self.datapoint = point
             return True
         except Exception as ex:

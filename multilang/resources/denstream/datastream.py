@@ -10,7 +10,6 @@ class DataStream:
     blist = ""
 
     datapoint = ""
-    time_id = 0
 
     # open the input file and create the output folder if it doesn't exist
     def init(self, outputfolder, bufferlist):
@@ -25,36 +24,11 @@ class DataStream:
         except Exception as e:
             print("Can't create folder: %s" %e)
 
-    # returns true if the next datapoint has been succesfully read
-    def next(self):
-        while True:
-            data = "nodata"
-            with self.blist.bufflock:
-                if self.blist.bufferlist:
-                    data = self.blist.bufferlist.pop(0)
-
-            if data == "nodata":
-                msec = 1 / 1000
-                time.sleep(msec)
-            else:
-                point = dp.DataPoint()
-                try:
-                    x = float(data[0])
-                    y = float(data[1])
-
-                    self.time_id += 1
-                    point_id = self.time_id
-
-                    point.init(x, y, point_id)
-                    self.datapoint = point
-                    return True
-                except Exception as ex:
-                    print("Skipping data: %s" %ex)
-
     # returns the last read datapoint
     def current_data_point(self):
         return self.datapoint
 
+    # convert the next datapoint
     def set_data_point(self, data):
         point = dp.DataPoint()
         try:
@@ -62,10 +36,7 @@ class DataStream:
             for dim in data:
                 x.append(float(dim))
 
-            self.time_id += 1
-            point_id = self.time_id
-
-            point.init(x, point_id)
+            point.init(x)
             self.datapoint = point
             return True
         except Exception as ex:
