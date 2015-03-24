@@ -36,26 +36,24 @@ class MicroCluster:
     # try to merge the point into this cluster, based on its radius
     def tryMerge(self, point, epsilonParam):
         center = list(self.CF1)
+        square_center = list(self.CF2)
+
+        max_radius = 0
+        new_w = self.w + 1
+
         for i in range(len(center)):
             center[i] = center[i] + point.x[i]
-
-        square_center = list(self.CF2)
-        for j in range(len(square_center)):
             square_center[i] = square_center[i] + point.x[i] * point.x[i]
 
-        center_length = point.vector_length(center) / (self.w + 1)
-        square_center_length = point.vector_length(square_center) / (self.w + 1)
+            dim_radius = (square_center[i] / new_w) - ((center[i] / new_w) * (center[i] / new_w))
+            if dim_radius < 0:
+                dim_radius = 0
+            dim_radius = math.sqrt(dim_radius)
 
-        radius = square_center_length - (center_length * center_length)
+            if max_radius < dim_radius:
+                max_radius = dim_radius  
 
-        #TODO: workaround for negative numbers
-        if(radius < 0):
-            radius = radius * (-1)
-
-        radius = math.sqrt(radius)
-        
-
-        if(radius <= epsilonParam):
+        if(max_radius <= epsilonParam):
             self.addPoint(point)
             return True
         else:
@@ -81,9 +79,7 @@ class MicroCluster:
 
     # elapse time if none where merged, the cluster is fading out in significance
     def noneMerged(self, lambdaParam, delta_time):
-        delta = 1.0
-        for i in range(int(lambdaParam * delta_time)):
-            delta = delta / 2
+        delta = 1.0 / math.pow(2.0, lambdaParam * delta_time)
 
         for j in range(len(self.CF1)):
             self.CF1[j] = self.CF1[j] * delta
@@ -96,29 +92,16 @@ class MicroCluster:
     # check if this outlier has become a real outlier
     def checkRealOutlierness(self, lambdaParam, tc, Tp):
         exp = lambdaParam * (tc - self.time_id + Tp)
-        score = 1.0
-        for i in range(int(exp)):
-            score = score / 2
-            print("score iterate: ",score)
+        score = 1.0 / math.pow(2.0, exp)
 
         score = score - 1
-        print("score -1: ", score)
 
         exp2 = lambdaParam * Tp
-        divide = 1.0
-        for j in range(int(exp2)):
-            divide = divide / 2
-            print("divide iterate: ", divide)
+        divide = 1.0 / math.pow(2.0, exp2)
 
         divide = divide - 1
-        print("divide -1: ", divide)
 
         score = score / divide
-        print("score/divide: ", score)
-
-        print("start")
-        print(self.w)
-        print(score)
 
         if self.w < score:
             return True
@@ -138,16 +121,15 @@ class MicroCluster:
         center = list(self.CF1)
         square_center = list(self.CF2)
 
-        center_length = dp.DataPoint().vector_length(center) / (self.w)
-        square_center_length = dp.DataPoint().vector_length(square_center) / (self.w)
+        max_radius = 0
 
-        radius = square_center_length - (center_length * center_length)
-        print("radius: ", radius)
+        for i in range(len(center)):
+            dim_radius = (square_center[i] / self.w) - ((center[i] / self.w) * (center[i] / self.w))
+            if dim_radius < 0:
+                dim_radius = 0
+            dim_radius = math.sqrt(dim_radius)
 
-        #TODO: workaround for negative numbers
-        if(radius < 0):
-            radius = radius * (-1)
-
-        radius = math.sqrt(radius)
+            if max_radius < dim_radius:
+                max_radius = dim_radius
         
-        return radius
+        return max_radius

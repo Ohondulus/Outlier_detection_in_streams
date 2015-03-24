@@ -86,19 +86,22 @@ class DenStreambolt(storm.BasicBolt):
 
     def process(self, tup):
         data = []
-        data = tup.values.split(",")
+        data = tup.values[0].split(",")
 
-        self.denstream.run_once(data)
+        self.denstream.run_once(data, 0.01)
 
-
+"""
 import random
 test = DenStreambolt()
 test.initialize("yes","yes")
-while(True):
-    x = random.randint(1,100)
-    y = random.randint(1,100)
+for i in range(200):
+    #x = random.random()
+    #y = random.random()
+    x = random.randint(0,100)
+    y = random.randint(0,100)
     val = ("%s,%s"%(x,y))
     tup = storm.Tuple("yes","yes","yes","yes",val)
     test.process(tup)
+"""
 
-#DenStreambolt().run()
+DenStreambolt().run()

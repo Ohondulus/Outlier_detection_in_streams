@@ -26,12 +26,17 @@ class DenStream:
     # current_t = the current time_id
     current_t = 0
 
+    # elapsed_t = the current time
+    elapsed_t = 0
+
     # class for visualization
     DSPlot = ""
     do_plot = False
 
     # some debug in code
     debug = False
+    deleted_safe = []
+    deleted_out = []
 
     def init(self, DS, betaParam, muParam, lambdaParam, epsilonParam, do_plot, plset):
         self.DS = DS
@@ -45,51 +50,59 @@ class DenStream:
         self.DSPlot.init(plset)
 
         p = self.betaParam * self.muParam
-        #TODO: Tp always 1
         self.Tp = math.ceil((1 / self.lambdaParam) * math.log(p / (p - 1),10))
 
     # step the algorithm with the new data point
-    def run_once(self, data):
+    def run_once(self, data, data_time_id):
         if self.DS.set_data_point(data):
             point = self.DS.current_data_point()
             self.current_t = self.current_t + 1
+            self.elapsed_t = self.elapsed_t + data_time_id
             # merge into a cluster or create a new one, and elapse time for all other clusters
             merged_cluster = self.merge(point)
             if self.debug:
-                print(self.current_t ,merged_cluster.getCenter(), merged_cluster.getRadius())
+                print(self.current_t ,merged_cluster.getCenter(), merged_cluster.getRadius(), merged_cluster.w)
 
             for cluster in self.MClusters:
                 if cluster != merged_cluster:
                     if self.debug:
-                        print(self.current_t ,merged_cluster.getCenter(), merged_cluster.getRadius())
-                    cluster.noneMerged(self.lambdaParam, 1)
+                        print(self.current_t ,cluster.getCenter(), cluster.getRadius(), cluster.w)
+                    cluster.noneMerged(self.lambdaParam, data_time_id)
                     if self.debug:
-                        print(self.current_t ,merged_cluster.getCenter(), merged_cluster.getRadius())
+                        print(self.current_t ,cluster.getCenter(), cluster.getRadius(), cluster.w)
 
             del_safe_clusters = []
             del_out_clusters = []
 
             # if Tp time has elapsed check for outliers and fading clusters
-            if self.current_t % self.Tp or self.Tp == 1:
+            if self.current_t % self.Tp or self.Tp == 1 or self.debug:
                 for cluster in self.MClusters:
                     # if the cluster is fading, delete it from memory
                     if not cluster.outlier:
                         if cluster.checkOutlierness(self.betaParam * self.muParam):
                             del_safe_clusters.append(cluster)
                     else:
-                        if cluster.checkRealOutlierness(self.lambdaParam, self.current_t, self.Tp):
+                        if cluster.checkRealOutlierness(self.lambdaParam, self.elapsed_t, self.Tp):
                             del_out_clusters.append(cluster)
 
 
                 for cluster in del_safe_clusters:
                     self.MClusters.remove(cluster)
+                    if self.debug:
+                        self.deleted_safe.append(cluster)
 
                 for cluster in del_out_clusters:
                     self.MClusters.remove(cluster)
+                    if self.debug:
+                        self.deleted_out.append(cluster)
 
                 if(self.do_plot):
-                    self.DSPlot.plot(self.MClusters, del_safe_clusters, del_out_clusters, self.DS.output, 
-                        self.current_t, point, merged_cluster)
+                    if self.debug:
+                        self.DSPlot.plot(self.MClusters, self.deleted_safe, self.deleted_out, self.DS.output, 
+                            self.current_t, point, merged_cluster)
+                    else:
+                        self.DSPlot.plot(self.MClusters, del_safe_clusters, del_out_clusters, self.DS.output, 
+                            self.current_t, point, merged_cluster)
 
     # merge point into closest micro cluster or make a new cluster
     def merge(self, point):
@@ -107,7 +120,7 @@ class DenStream:
             else:
                 new_cluster = microcluster.MicroCluster()
                 new_cluster.addPoint(point)
-                new_cluster.setOutlier(self.current_t)
+                new_cluster.setOutlier(self.elapsed_t)
                 self.MClusters.append(new_cluster)
                 return new_cluster
 
