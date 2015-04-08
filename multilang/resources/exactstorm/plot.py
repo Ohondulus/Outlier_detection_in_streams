@@ -22,6 +22,8 @@ class ESPlot:
 
     # plot the figure into the files
     def plot(self, dp_list, outputfolder, t):
+        plt.figure(figsize=(6,6))
+
         ix = []
         iy = []
         ox = []
@@ -30,14 +32,15 @@ class ESPlot:
         # gather all x and y attributes into different lists
         for dp in dp_list:
             if dp.outlier:
-                ox.append(dp.x)
-                oy.append(dp.y)
+                ox.append(dp.x[0])
+                oy.append(dp.x[1])
             else:
-                ix.append(dp.x)
-                iy.append(dp.y)
+                ix.append(dp.x[0])
+                iy.append(dp.x[1])
 
         # plot with the datapoints / this is like the Matlab plot function
-        plt.plot(ix, iy, 'yo', ox, oy, 'ro')
+        plt.plot(ix, iy, 'o', color = "#4daf4a")
+        plt.plot(ox, oy, 'o', color = "#e41a1c")
         #plt.legend(["Inl", "Outl"])
 
         if self.use_axis:
@@ -46,10 +49,10 @@ class ESPlot:
         if self.radius:
             circles = []
             for dp in dp_list:
-                col = 'b'
+                col = "#4daf4a"
                 if dp.outlier:
-                    col = 'r'
-                circles.append(plt.Circle((dp.x,dp.y), self.R, color=col, fill=False))
+                    col = "#e41a1c"
+                circles.append(plt.Circle((dp.x[0],dp.x[1]), self.R, color=col, fill=False))
 
             for c in circles:
                 plt.gca().add_artist(c)
@@ -61,5 +64,6 @@ class ESPlot:
         except Exception as e:
             print("Exception opening file: %s" %e)
         plt.gca().set_aspect("equal")
-        plt.savefig(figfile)
+        plt.gca().grid(which = "both", alpha = 0.7)
+        plt.savefig(figfile, dpi= 100)
         plt.close()

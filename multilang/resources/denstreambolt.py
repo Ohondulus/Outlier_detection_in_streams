@@ -28,12 +28,14 @@ class DenStreambolt(storm.BasicBolt):
         mu_option = "mu"
         lambda_option = "lambda"
         epsilon_option = "epsilon"
+        st_option = "sample_time"
 
         try:
             beta = float(config.get(section, beta_option))
             mu = float(config.get(section, mu_option))
             lamb = float(config.get(section, lambda_option))
             epsilon = float(config.get(section, epsilon_option))
+            st = float(config.get(section, st_option))
         except Exception as e:
             print("Exception in the configfile options: %s" %e)
 
@@ -77,11 +79,11 @@ class DenStreambolt(storm.BasicBolt):
 
         # create DataStream object for reading the input file
         data_stream = ds.DataStream()
-        data_stream.init(outfolder, self)
+        data_stream.init(outfolder, self, do_plot)
 
         # create, initialize then run the implementation of DenStream
         denstream = dens.DenStream()
-        denstream.init(data_stream, beta, mu, lamb, epsilon, do_plot, plot_settings)
+        denstream.init(data_stream, beta, mu, lamb, epsilon, do_plot, st, plot_settings)
         self.denstream = denstream
 
     def process(self, tup):
@@ -103,5 +105,24 @@ for i in range(200):
     tup = storm.Tuple("yes","yes","yes","yes",val)
     test.process(tup)
 """
+"""
+import csv
+test = DenStreambolt()
+test.initialize("yes","yes")
+c = "/home/ohondulus/Downloads/ma1.csv"
+with open(c, "rb") as csvfile:
+    reader = csv.reader(csvfile, delimiter = ",")
+    for row in reader:
+        x = row[0]
+        y = row[1]
+        val = [("%s,%s" %(x,y))]
+        tup = storm.Tuple("yes","yes","yes","yes",val)
+        test.process(tup)
+num = 0
+for clus in test.denstream.MClusters:
+    num = num + clus.pnum
 
+print(test.denstream.errnum)
+print(test.denstream.pnum + num)
+"""
 DenStreambolt().run()

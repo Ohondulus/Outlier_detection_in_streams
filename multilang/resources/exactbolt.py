@@ -2,11 +2,8 @@ import storm
 import exactstorm.datastream as ds
 import exactstorm.exactstorm as es
 import ConfigParser as cp
-#import threading
 
 class Exactbolt(storm.BasicBolt):
-    #bufferlist = []
-    #bufflock = threading.Lock()
     exs = ""
 
     sample = 0
@@ -80,16 +77,13 @@ class Exactbolt(storm.BasicBolt):
 
         # create DataStream object for reading the input file
         data_stream = ds.DataStream()
-        data_stream.init(outfolder, self)
+        data_stream.init(outfolder, self, st)
 
         # create, initialize then run the implementation of Exact Storm
         exactstorm = es.ExactStorm()
         exactstorm.init(W, R, k, data_stream, st, plot_settings, rescale)
         self.exs = exactstorm
         self.sample = st
-        #self.exs = threading.Thread(target = exactstorm.run_exact_storm)
-        #self.exs.setDaemon(True)
-        #self.exs.start()
 
     def process(self, tup):
         data = []
@@ -101,15 +95,39 @@ class Exactbolt(storm.BasicBolt):
         if self.t >= self.sample and self.sample != -1:
             self.exs.sample_outliers_and_plot()
             self.t = 0
-        #with self.bufflock:
-        #    self.bufferlist.append(data)
+
 
 """
+import random
 test = Exactbolt()
 test.initialize("yes","yes")
-while(True):
-    val = ("1,1,1,1,1")
+for i in range(10):
+    x = 0
+    y = 0
+    if random.randint(0,100) > 90:
+        x = random.randint(0,100) / 100.0
+        y = random.randint(0,100) / 100.0
+    else:
+        x = random.randint(40,60) / 100.0
+        y = random.randint(40,60) / 100.0
+    val = [("%s,%s" %(x,y))]
     tup = storm.Tuple("yes","yes","yes","yes",val)
     test.process(tup)
+"""
+"""
+import csv
+test = Exactbolt()
+test.initialize("yes","yes")
+c = "/home/ohondulus/Downloads/ma2.csv"
+with open(c, "rb") as csvfile:
+    reader = csv.reader(csvfile, delimiter = ",")
+    for row in reader:
+        x = row[0]
+        y = row[1]
+        val = [("%s,%s" %(x,y))]
+        tup = storm.Tuple("yes","yes","yes","yes",val)
+        test.process(tup)
+print(test.exs.errnum)
+print(test.exs.pnum)
 """
 Exactbolt().run()

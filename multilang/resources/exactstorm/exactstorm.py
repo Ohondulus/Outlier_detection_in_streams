@@ -34,6 +34,9 @@ class ExactStorm:
     # rescale = rescaling datapoints to be between 0 and 1
     rescale = False
 
+    errnum = 0
+    pnum = 0
+
     # set basic parameters
     def init(self, W, R, k, DS, st, plset, rescale):
         self.W = W
@@ -113,7 +116,10 @@ class ExactStorm:
     # removes the oldest object from the window if its full
     def remove_node(self):
         if len(self.ISB) >= self.W:
-            self.ISB.pop(0)
+            expired = self.ISB.pop(0)
+            if expired.count_after + len(expired.nn_before) < self.k:
+                self.errnum = self.errnum + 1
+            self.pnum = expired.time_id
 
     # search the radius of the point for neighbors
     def range_search(self, curr_point):

@@ -13,17 +13,18 @@ class DataStream:
     time_id = 0
 
     # open the input file and create the output folder if it doesn't exist
-    def init(self, outputfolder, bufferlist):
+    def init(self, outputfolder, bufferlist, st):
         self.blist = bufferlist
 
-        time = datetime.datetime.now().strftime("_%Y_%m_%d_%H_%M_%S")
-        self.output = outputfolder + time
+        if st != -1:
+            time = datetime.datetime.now().strftime("_%Y_%m_%d_%H_%M_%S")
+            self.output = outputfolder + time
 
-        try:
-            if not os.path.exists(self.output):
-                os.makedirs(self.output)
-        except Exception as e:
-            print("Can't create folder: %s" %e)
+            try:
+                if not os.path.exists(self.output):
+                    os.makedirs(self.output)
+            except Exception as e:
+                print("Can't create folder: %s" %e)
 
     # returns true if the next datapoint has been succesfully read
     def next(self):

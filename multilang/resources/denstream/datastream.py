@@ -12,17 +12,18 @@ class DataStream:
     datapoint = ""
 
     # open the input file and create the output folder if it doesn't exist
-    def init(self, outputfolder, bufferlist):
+    def init(self, outputfolder, bufferlist, do_plot):
         self.blist = bufferlist
 
-        time = datetime.datetime.now().strftime("_%Y_%m_%d_%H_%M_%S")
-        self.output = outputfolder + time
+        if do_plot:
+            time = datetime.datetime.now().strftime("_%Y_%m_%d_%H_%M_%S")
+            self.output = outputfolder + time
 
-        try:
-            if not os.path.exists(self.output):
-                os.makedirs(self.output)
-        except Exception as e:
-            print("Can't create folder: %s" %e)
+            try:
+                if not os.path.exists(self.output):
+                    os.makedirs(self.output)
+            except Exception as e:
+                print("Can't create folder: %s" %e)
 
     # returns the last read datapoint
     def current_data_point(self):

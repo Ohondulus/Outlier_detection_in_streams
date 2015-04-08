@@ -41,6 +41,7 @@ class Korm:
 
     # kp = visualization object for the algorithm
     kp = plot.KormPlot()
+    sample_phase = 0
     sample_ofl = False
     sample_clu = False
 
@@ -48,13 +49,14 @@ class Korm:
     j = 0
 
     # initialize the parameters for the run
-    def init(self, data_stream, n, k, P, O, gamma, beta, Num, plot_settings):
+    def init(self, data_stream, n, k, P, O, gamma, beta, Num, st, plot_settings):
         self.X = data_stream
         self.n = n
         self.k = k
         self.p = P
         self.O = O
         self.Num = Num
+        self.sample_phase = st
         
         if plot_settings.pop(0):
             self.sample_ofl = plot_settings.pop(0)
@@ -74,8 +76,9 @@ class Korm:
             self.j = 1
             self.first_run = False
 
-            # make a visualization of the starting points
-            self.kp.plot(Xj, self.facils, self.temp_out, self.real_out)
+            if self.sample_phase != 0:
+                # make a visualization of the starting points
+                self.kp.plot(Xj, self.facils, self.temp_out, self.real_out)
 
         self.Hj = self.set_hb(Xj) / 2.0
 
@@ -93,9 +96,9 @@ class Korm:
                 self.temp_out.remove(ro)
                 self.real_out.append(ro)
 
-
-        # make a visualization of this phase
-        self.kp.plot(Xj, self.facils, self.temp_out, self.real_out)
+        if self.j % self.sample_phase == 0:
+            # make a visualization of this phase
+            self.kp.plot(Xj, self.facils, self.temp_out, self.real_out)
 
         # stop if it reached the last phase
         self.j += 1
@@ -139,6 +142,8 @@ class Korm:
                 if not (theta == p.dist):
                     change = True
                     p.dist = theta
+
+                p.unassign()
 
                 # make point new facility
                 if far and len(self.facils) < (self.k * math.log10(self.n)):

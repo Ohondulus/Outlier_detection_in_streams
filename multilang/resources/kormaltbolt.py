@@ -31,6 +31,7 @@ class Kormbolt(storm.BasicBolt):
         gamma_option = "Gamma"
         beta_option = "Beta"
         Num_option = "Num_points_in_chunk"
+        st_option = "Sample_phase"
 
         try:
             n = int(config.get(section, n_option))
@@ -40,6 +41,7 @@ class Kormbolt(storm.BasicBolt):
             gamma = int(config.get(section, gamma_option))
             beta = int(config.get(section, beta_option))
             Num = int(config.get(section, Num_option))
+            st = float(config.get(section, st_option))
         except Exception as e:
             print("Exception in the configfile options: %s" %e)
 
@@ -83,11 +85,11 @@ class Kormbolt(storm.BasicBolt):
 
         # create DataStream object for reading the input file
         data_stream = ds.DataStream()
-        data_stream.init(outfolder, n, Num)
+        data_stream.init(outfolder, n, Num, st)
 
         # create, initialize then run the implementation of Korm
         self.korm = kr.Korm()
-        self.korm.init(data_stream, n, k, P, O, gamma, beta, Num, plot_settings)
+        self.korm.init(data_stream, n, k, P, O, gamma, beta, Num, st, plot_settings)
 
         self.Num = Num
         #self.korm.run_korm()
@@ -110,5 +112,31 @@ test.initialize("yes","yes")
 while(True):
     tup = storm.Tuple("yes","yes","yes","yes",(1,1))
     test.process(tup)
+"""
+"""
+import csv
+test = Kormbolt()
+test.initialize("yes","yes")
+c = "/home/ohondulus/Downloads/ma2.csv"
+with open(c, "rb") as csvfile:
+    reader = csv.reader(csvfile, delimiter = ",")
+    for row in reader:
+        x = row[0]
+        y = row[1]
+        val = [("%s,%s" %(x,y))]
+        tup = storm.Tuple("yes","yes","yes","yes",val)
+        test.process(tup)
+
+errnum = 0
+pnum = 0
+for c in test.korm.real_out:
+    errnum = errnum + c.weight
+    pnum = pnum + c.weight
+
+for c in test.korm.facils:
+    pnum = pnum + c.weight
+
+print(errnum)
+print(pnum)
 """
 Kormbolt().run()

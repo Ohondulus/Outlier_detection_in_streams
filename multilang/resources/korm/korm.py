@@ -49,6 +49,7 @@ class Korm:
 
     # kp = visualization object for the algorithm
     kp = plot.KormPlot()
+    sample_phase = 0
     sample_ofl = False
     sample_clu = False
 
@@ -56,7 +57,7 @@ class Korm:
     j = 0
 
     # initialize the parameters for the run
-    def init(self, data_stream, n, k, P, O, gamma, beta, Num, plot_settings):
+    def init(self, data_stream, n, k, P, O, gamma, beta, Num, st, plot_settings):
         self.X = data_stream
         self.n = n
         self.k = k
@@ -65,6 +66,7 @@ class Korm:
         self.gamma = gamma
         self.beta = beta
         self.Num = Num
+        self.sample_phase = st
         
         if plot_settings.pop(0):
             self.sample_ofl = plot_settings.pop(0)
@@ -86,8 +88,9 @@ class Korm:
             self.j = 1
             self.first_run = False
 
-            # make a visualization of the starting points
-            self.kp.plot(Xj, self.facils, self.temp_out, self.real_out)
+            if self.sample_phase != 0:
+                # make a visualization of the starting points
+                self.kp.plot(Xj, self.facils, self.temp_out, self.real_out)
 
         # calculate the facility cost for current window
         self.Fj = self.Lj / (self.k * (1 + math.log10(self.n)))
@@ -106,9 +109,9 @@ class Korm:
                 self.temp_out.remove(ro)
                 self.real_out.append(ro)
 
-
-        # make a visualization of this phase
-        self.kp.plot(Xj, self.facils, self.temp_out, self.real_out)
+        if self.j % self.sample_phase == 0:
+            # make a visualization of this phase
+            self.kp.plot(Xj, self.facils, self.temp_out, self.real_out)
 
         # increase the lower bound
         self.Lj = self.Lj * self.beta

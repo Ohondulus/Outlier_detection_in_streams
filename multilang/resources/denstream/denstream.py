@@ -37,13 +37,19 @@ class DenStream:
     debug = False
     deleted_safe = []
     deleted_out = []
+    st = 0
 
-    def init(self, DS, betaParam, muParam, lambdaParam, epsilonParam, do_plot, plset):
+    errnum = 0
+    pnum = 0
+
+    def init(self, DS, betaParam, muParam, lambdaParam, epsilonParam, do_plot, st, plset):
         self.DS = DS
         self.betaParam = betaParam
         self.muParam = muParam
         self.lambdaParam = lambdaParam
         self.epsilonParam = epsilonParam
+
+        self.st = st
 
         self.DSPlot = plot.DSPlot()
         self.do_plot = do_plot
@@ -75,7 +81,7 @@ class DenStream:
             del_out_clusters = []
 
             # if Tp time has elapsed check for outliers and fading clusters
-            if self.current_t % self.Tp or self.Tp == 1 or self.debug:
+            if self.current_t % self.Tp == 0 or self.Tp == 1 or self.debug:
                 for cluster in self.MClusters:
                     # if the cluster is fading, delete it from memory
                     if not cluster.outlier:
@@ -88,15 +94,20 @@ class DenStream:
 
                 for cluster in del_safe_clusters:
                     self.MClusters.remove(cluster)
+                    self.pnum = self.pnum + cluster.pnum
+
                     if self.debug:
                         self.deleted_safe.append(cluster)
 
                 for cluster in del_out_clusters:
                     self.MClusters.remove(cluster)
+                    self.errnum = self.errnum + cluster.pnum
+                    self.pnum = self.pnum + cluster.pnum
+
                     if self.debug:
                         self.deleted_out.append(cluster)
 
-                if(self.do_plot):
+                if(self.do_plot and self.current_t % self.st == 0):
                     if self.debug:
                         self.DSPlot.plot(self.MClusters, self.deleted_safe, self.deleted_out, self.DS.output, 
                             self.current_t, point, merged_cluster)

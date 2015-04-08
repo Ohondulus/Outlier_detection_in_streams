@@ -9,6 +9,8 @@ class MicroCluster:
     time_id = 0
     outlier = False
 
+    pnum = 0
+
     # check if its an outlier cluster
     def checkOutlierness(self, outlier_weight):
         if self.w > outlier_weight:
@@ -76,6 +78,7 @@ class MicroCluster:
                 self.CF2[i] = self.CF2[i] + point.x[i] * point.x[i]
 
         self.w = self.w + 1
+        self.pnum = self.pnum + 1
 
     # elapse time if none where merged, the cluster is fading out in significance
     def noneMerged(self, lambdaParam, delta_time):

@@ -20,32 +20,34 @@ class DSPlot:
 
     # plot the figure into the files
     def plot(self, clusters, safe_fading, out_fading, outputfolder, t, point, merged_cluster):
-        plt.plot(point.x[0], point.x[1], 'bx')
-        plt.plot([point.x[0], merged_cluster.getCenter()[0]], [point.x[1], merged_cluster.getCenter()[1]])
+        plt.figure(figsize=(6,6))
+
+        #plt.plot(point.x[0], point.x[1], 'x', color = "#ffff33")
+        #plt.plot([point.x[0], merged_cluster.getCenter()[0]], [point.x[1], merged_cluster.getCenter()[1]])
         circles = []
 
         for c in clusters:
             point = c.getCenter()
             if c.outlier:
-                plt.plot(point[0], point[1], 'go')
+                plt.plot(point[0], point[1], 'o', color = "#ff7f00")
                 if self.radius:
-                    circles.append(plt.Circle((point[0], point[1]), c.getRadius(), color='g', fill=False))
+                    circles.append(plt.Circle((point[0], point[1]), c.getRadius(), color="#ff7f00", fill=False))
             else:
-                plt.plot(point[0], point[1], 'yo')
+                plt.plot(point[0], point[1], 'o', color = "#4daf4a")
                 if self.radius:
-                    circles.append(plt.Circle((point[0], point[1]), c.getRadius(), color='y', fill=False))
+                    circles.append(plt.Circle((point[0], point[1]), c.getRadius(), color="#4daf4a", fill=False))
 
         for c in safe_fading:
             point = c.getCenter()
-            plt.plot(point[0], point[1], 'bo')
+            plt.plot(point[0], point[1], 'o', color = "#377eb8")
             if self.radius:
-                circles.append(plt.Circle((point[0], point[1]), c.getRadius(), color='b', fill=False))
+                circles.append(plt.Circle((point[0], point[1]), c.getRadius(), color="#377eb8", fill=False))
 
         for c in out_fading:
             point = c.getCenter()
-            plt.plot(point[0], point[1], 'ro')
+            plt.plot(point[0], point[1], 'o', color = "#e41a1c")
             if self.radius:
-                circles.append(plt.Circle((point[0], point[1]), c.getRadius(), color='r', fill=False))
+                circles.append(plt.Circle((point[0], point[1]), c.getRadius(), color="#e41a1c", fill=False))
 
         if self.use_axis:
             plt.axis([self.lx,self.tx,self.ly,self.ty])
@@ -60,5 +62,6 @@ class DSPlot:
         except Exception as e:
             print("Exception opening file: %s" %e)
         plt.gca().set_aspect("equal")
-        plt.savefig(figfile)
+        plt.gca().grid(which = "both", alpha = 0.7)
+        plt.savefig(figfile, dpi= 100)
         plt.close()
