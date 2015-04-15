@@ -105,14 +105,21 @@ for i in range(200):
     tup = storm.Tuple("yes","yes","yes","yes",val)
     test.process(tup)
 """
-"""
+
 import csv
 test = DenStreambolt()
 test.initialize("yes","yes")
-c = "/home/ohondulus/Downloads/ma1.csv"
+c = "/home/ohondulus/Downloads/ma2.csv"
+first = True
 with open(c, "rb") as csvfile:
     reader = csv.reader(csvfile, delimiter = ",")
     for row in reader:
+        if first:
+            first = False
+            test.denstream.DSPlot.lx = float(row[2])
+            test.denstream.DSPlot.tx = float(row[3])
+            test.denstream.DSPlot.ly = float(row[4])
+            test.denstream.DSPlot.ty = float(row[5])
         x = row[0]
         y = row[1]
         val = [("%s,%s" %(x,y))]
@@ -124,5 +131,5 @@ for clus in test.denstream.MClusters:
 
 print(test.denstream.errnum)
 print(test.denstream.pnum + num)
-"""
-DenStreambolt().run()
+
+#DenStreambolt().run()

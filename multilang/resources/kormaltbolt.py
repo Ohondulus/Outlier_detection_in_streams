@@ -113,14 +113,21 @@ while(True):
     tup = storm.Tuple("yes","yes","yes","yes",(1,1))
     test.process(tup)
 """
-"""
+
 import csv
 test = Kormbolt()
 test.initialize("yes","yes")
-c = "/home/ohondulus/Downloads/ma2.csv"
+c = "/home/ohondulus/Downloads/ma1.csv"
+first = True
 with open(c, "rb") as csvfile:
     reader = csv.reader(csvfile, delimiter = ",")
     for row in reader:
+        if first:
+            first = False
+            test.korm.kp.lx = float(row[2])
+            test.korm.kp.tx = float(row[3])
+            test.korm.kp.ly = float(row[4])
+            test.korm.kp.ty = float(row[5])
         x = row[0]
         y = row[1]
         val = [("%s,%s" %(x,y))]
@@ -136,7 +143,10 @@ for c in test.korm.real_out:
 for c in test.korm.facils:
     pnum = pnum + c.weight
 
+for c in test.korm.safe_out:
+    pnum = pnum + c.weight
+
 print(errnum)
 print(pnum)
-"""
-Kormbolt().run()
+
+#Kormbolt().run()

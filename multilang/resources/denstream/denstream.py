@@ -42,6 +42,9 @@ class DenStream:
     errnum = 0
     pnum = 0
 
+    show_all = True
+    all_p = []
+
     def init(self, DS, betaParam, muParam, lambdaParam, epsilonParam, do_plot, st, plset):
         self.DS = DS
         self.betaParam = betaParam
@@ -62,6 +65,8 @@ class DenStream:
     def run_once(self, data, data_time_id):
         if self.DS.set_data_point(data):
             point = self.DS.current_data_point()
+            if self.show_all:
+                self.all_p.append(point)
             self.current_t = self.current_t + 1
             self.elapsed_t = self.elapsed_t + data_time_id
             # merge into a cluster or create a new one, and elapse time for all other clusters
@@ -96,7 +101,7 @@ class DenStream:
                     self.MClusters.remove(cluster)
                     self.pnum = self.pnum + cluster.pnum
 
-                    if self.debug:
+                    if self.show_all:
                         self.deleted_safe.append(cluster)
 
                 for cluster in del_out_clusters:
@@ -104,16 +109,12 @@ class DenStream:
                     self.errnum = self.errnum + cluster.pnum
                     self.pnum = self.pnum + cluster.pnum
 
-                    if self.debug:
+                    if self.show_all:
                         self.deleted_out.append(cluster)
 
                 if(self.do_plot and self.current_t % self.st == 0):
-                    if self.debug:
-                        self.DSPlot.plot(self.MClusters, self.deleted_safe, self.deleted_out, self.DS.output, 
-                            self.current_t, point, merged_cluster)
-                    else:
-                        self.DSPlot.plot(self.MClusters, del_safe_clusters, del_out_clusters, self.DS.output, 
-                            self.current_t, point, merged_cluster)
+                    self.DSPlot.plot(self.MClusters, self.deleted_safe, self.deleted_out, self.DS.output, 
+                        self.current_t, point, merged_cluster, self.all_p)
 
     # merge point into closest micro cluster or make a new cluster
     def merge(self, point):

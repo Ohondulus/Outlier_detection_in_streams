@@ -21,13 +21,25 @@ class ESPlot:
         self.R = plset.pop(0)
 
     # plot the figure into the files
-    def plot(self, dp_list, outputfolder, t):
+    def plot(self, dp_list, outputfolder, t, all_p, exactstorm):
         plt.figure(figsize=(6,6))
 
         ix = []
         iy = []
         ox = []
         oy = []
+        ax = []
+        ay = []
+        aox = []
+        aoy = []
+
+        for a in all_p:
+            if a.count_after + len(a.nn_before) < exactstorm.k:
+                aox.append(a.x[0])
+                aoy.append(a.x[1])
+            else:
+                ax.append(a.x[0])
+                ay.append(a.x[1])
 
         # gather all x and y attributes into different lists
         for dp in dp_list:
@@ -39,7 +51,9 @@ class ESPlot:
                 iy.append(dp.x[1])
 
         # plot with the datapoints / this is like the Matlab plot function
-        plt.plot(ix, iy, 'o', color = "#4daf4a")
+        plt.plot(ax, ay, 'o', color = "#377eb8", alpha = 0.5)
+        plt.plot(aox, aoy, 'o', color = "#e41a1c", alpha = 0.5)
+        plt.plot(ix, iy, 'o', color = "#377eb8")
         plt.plot(ox, oy, 'o', color = "#e41a1c")
         #plt.legend(["Inl", "Outl"])
 

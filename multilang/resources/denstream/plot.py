@@ -19,8 +19,11 @@ class DSPlot:
         self.radius = plset.pop(0)
 
     # plot the figure into the files
-    def plot(self, clusters, safe_fading, out_fading, outputfolder, t, point, merged_cluster):
+    def plot(self, clusters, safe_fading, out_fading, outputfolder, t, point, merged_cluster, all_p):
         plt.figure(figsize=(6,6))
+
+        for p in all_p:
+            plt.plot(p.x[0], p.x[1], 'o', color = "#377eb8", alpha = 0.5)
 
         #plt.plot(point.x[0], point.x[1], 'x', color = "#ffff33")
         #plt.plot([point.x[0], merged_cluster.getCenter()[0]], [point.x[1], merged_cluster.getCenter()[1]])
@@ -39,7 +42,7 @@ class DSPlot:
 
         for c in safe_fading:
             point = c.getCenter()
-            plt.plot(point[0], point[1], 'o', color = "#377eb8")
+            plt.plot(point[0], point[1], 'o', color = "#984ea3")
             if self.radius:
                 circles.append(plt.Circle((point[0], point[1]), c.getRadius(), color="#377eb8", fill=False))
 

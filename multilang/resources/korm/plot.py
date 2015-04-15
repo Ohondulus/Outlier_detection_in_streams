@@ -21,7 +21,7 @@ class KormPlot:
         self.output = plset.pop(0)
 
     # plot the figure into the files
-    def plot(self, dp_list, fac_list, tout_list, rout_list):
+    def plot(self, dp_list, fac_list, tout_list, rout_list, safe_list, all_p):
         plt.figure(figsize=(6,6))
         
         dpx = []
@@ -32,6 +32,10 @@ class KormPlot:
         toy = []
         rox = []
         roy = []
+        sx = []
+        sy = []
+        apx = []
+        apy = []
 
         # gather all x and y attributes into different lists
         for dp in dp_list:
@@ -50,11 +54,21 @@ class KormPlot:
             rox.append(ro.x[0])
             roy.append(ro.x[1])
 
+        for so in safe_list:
+            sx.append(so.x[0])
+            sy.append(so.x[1])
+
+        for a in all_p:
+            apx.append(a.x[0])
+            apy.append(a.x[1])
+
         # plot with the datapoints / this is like the Matlab plot function
+        plt.plot(apx, apy, 'o', color = "#377eb8", alpha = 0.5)
         plt.plot(dpx, dpy, 'o', color = "#377eb8")
-        plt.plot(fx, fy, 'o', color = "#4daf4a") 
+        plt.plot(fx, fy, 'o', color = "#4daf4a")
         plt.plot(tox, toy, 'o', color = "#ff7f00")
         plt.plot(rox, roy, 'o', color = "#e41a1c")
+        plt.plot(sx, sy, 'o', color = "#984ea3")
         #plt.legend(["DP", "Fac", "TeO", "ReO"])
 
         if self.use_axis:
@@ -72,7 +86,7 @@ class KormPlot:
         plt.close()
 
     # plot a step of online_fl
-    def plot_step(self, dp_list, fac_list, tout_list, rout_list, curr_point, curr_fac, new_fac):
+    def plot_step(self, dp_list, fac_list, tout_list, rout_list, curr_point, curr_fac, new_fac, all_p):
         plt.figure(figsize=(6,6))
 
         dpx = []
@@ -83,6 +97,9 @@ class KormPlot:
         toy = []
         rox = []
         roy = []
+        apx = []
+        apy = []
+
         cx = curr_point.x[0]
         cy = curr_point.x[1]
         cfx = curr_fac.x[0]
@@ -104,6 +121,10 @@ class KormPlot:
         for ro in rout_list:
             rox.append(ro.x[0])
             roy.append(ro.x[1])
+
+        for a in all_p:
+            apx.append(a.x[0])
+            apy.append(a.x[1])
 
         # plot with the datapoints / this is like the Matlab plot function
         plt.plot(dpx, dpy, 'yo', color = "#377eb8")

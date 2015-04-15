@@ -114,14 +114,21 @@ for i in range(10):
     tup = storm.Tuple("yes","yes","yes","yes",val)
     test.process(tup)
 """
-"""
+
 import csv
 test = Exactbolt()
 test.initialize("yes","yes")
-c = "/home/ohondulus/Downloads/ma2.csv"
+c = "/home/ohondulus/Downloads/ma1.csv"
+first = True
 with open(c, "rb") as csvfile:
     reader = csv.reader(csvfile, delimiter = ",")
     for row in reader:
+        if first:
+            first = False
+            test.exs.ISB_plot.lx = float(row[2])
+            test.exs.ISB_plot.tx = float(row[3])
+            test.exs.ISB_plot.ly = float(row[4])
+            test.exs.ISB_plot.ty = float(row[5])
         x = row[0]
         y = row[1]
         val = [("%s,%s" %(x,y))]
@@ -129,5 +136,5 @@ with open(c, "rb") as csvfile:
         test.process(tup)
 print(test.exs.errnum)
 print(test.exs.pnum)
-"""
-Exactbolt().run()
+
+#Exactbolt().run()

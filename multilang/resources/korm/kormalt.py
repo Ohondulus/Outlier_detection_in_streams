@@ -47,6 +47,11 @@ class Korm:
 
     first_run = True
     j = 0
+    
+    # TODO: debug code
+    debug = True
+    safe_out = []
+    all_points = []
 
     # initialize the parameters for the run
     def init(self, data_stream, n, k, P, O, gamma, beta, Num, st, plot_settings):
@@ -69,16 +74,23 @@ class Korm:
         self.X.process_data(chunk)
         # get the current chunk of data and the facilities to it
         Xj = self.X.current_chunk()
+        if self.debug:
+            for p in Xj:
+                self.all_points.append(p)
+
         for f in self.facils:
             Xj.append(f)
 
         if self.first_run:
+            #self.n = 0
             self.j = 1
             self.first_run = False
 
-            if self.sample_phase != 0:
+            #if self.sample_phase != 0:
                 # make a visualization of the starting points
-                self.kp.plot(Xj, self.facils, self.temp_out, self.real_out)
+                #self.kp.plot(Xj, self.facils, self.temp_out, self.real_out, self.safe_out, self.all_points)
+
+        #self.n = self.n + len(Xj)
 
         self.Hj = self.set_hb(Xj) / 2.0
 
@@ -88,17 +100,20 @@ class Korm:
         # check if temporal outlier is a real outlier and reassign it
         real_outs = []
         for f in self.facils:
-            if f.outlierscore == self.O:
+            if f.outlierscore >= self.O:                         
                 real_outs.append(f)
 
         for ro in real_outs:
                 self.facils.remove(ro)
                 self.temp_out.remove(ro)
-                self.real_out.append(ro)
+                if f.weight <= self.Num / (self.k / 2):
+                    self.real_out.append(ro)
+                else:
+                    self.safe_out.append(ro)
 
         if self.j % self.sample_phase == 0:
             # make a visualization of this phase
-            self.kp.plot(Xj, self.facils, self.temp_out, self.real_out)
+            self.kp.plot(Xj, self.facils, self.temp_out, self.real_out, self.safe_out, self.all_points)
 
         # stop if it reached the last phase
         self.j += 1
@@ -146,7 +161,7 @@ class Korm:
                 p.unassign()
 
                 # make point new facility
-                if far and len(self.facils) < (self.k * math.log10(self.n)):
+                if far and len(self.facils) < self.k + (self.Num / 2): #(self.k * math.log10(self.n)):
                     self.facils.append(p)
                     change = True
 

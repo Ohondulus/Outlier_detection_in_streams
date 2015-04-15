@@ -37,6 +37,9 @@ class ExactStorm:
     errnum = 0
     pnum = 0
 
+    debug = True
+    all_p = []
+
     # set basic parameters
     def init(self, W, R, k, DS, st, plset, rescale):
         self.W = W
@@ -103,6 +106,8 @@ class ExactStorm:
 
             # get the current point from the stream
             curr_point = self.DS.current_data_point()
+            if self.debug:
+                self.all_p.append(curr_point)
             curr_point.set_pivot_distance(self.pivot)
             self.t = curr_point.time_id
             
@@ -153,4 +158,4 @@ class ExactStorm:
             else:
                 dp.outlier = True
 
-        self.ISB_plot.plot(self.ISB, self.DS.output, self.t)
+        self.ISB_plot.plot(self.ISB, self.DS.output, self.t, self.all_p, self)
